@@ -1,16 +1,11 @@
 {
-  "title": "Text Plugin",
-  "configureText": "Configure Text Content",
   "editText": "Edit Text",
-  "viewText": "View Text",
+  "viewEditText": "Edit",
   "save": "Save",
   "saving": "Saving...",
-  "saveSuccess": "Saved successfully",
-  "saveError": "Failed to save",
+  "saveSuccess": "Save Success",
+  "saveError": "Save Failed",
   "cancel": "Cancel",
-  "textPlaceholder": "Enter your Markdown text here...\n\nYou can use:\n- **Bold** text\n- *Italic* text\n- ~~Strikethrough~~\n- Lists\n- Links\n- Tables\n- Task lists: - [x] Done\n- And more GFM features!",
-  "noContent": "No content configured. Click 'Edit Text' to add content.",
-  "noStorage": "Please configure the text plugin first",
-  "goConfig": "Go to Configuration",
+  "textPlaceholder": "Enter text here (Markdown supported)...",
   "initializing": "Initializing..."
 }

@@ -15,14 +15,6 @@ export const TextViewer = ({ onEdit, showEditButton = false }: TextViewerProps) 
   const { storage } = useTextContext();
   const content = storage?.content || '';
 
-  if (!content) {
-    return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        {t('noContent')}
-      </div>
-    );
-  }
-
   return (
     <div className="h-full flex flex-col">
       {showEditButton && onEdit && (
@@ -33,12 +25,12 @@ export const TextViewer = ({ onEdit, showEditButton = false }: TextViewerProps) 
             onClick={onEdit}
             className="text-xs"
           >
-            {t('editText')}
+            {t('viewEditText')}
           </Button>
         </div>
       )}
       <div className="flex-1 overflow-auto px-3 py-4">
-        <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:text-foreground prose-li:text-foreground prose-a:text-primary">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </div>

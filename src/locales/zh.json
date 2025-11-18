@@ -1,16 +1,11 @@
 {
-  "title": "文本插件",
-  "configureText": "配置文本内容",
   "editText": "编辑文本",
-  "viewText": "查看文本",
+  "viewEditText": "编辑",
   "save": "保存",
   "saving": "保存中...",
   "saveSuccess": "保存成功",
   "saveError": "保存失败",
   "cancel": "取消",
-  "textPlaceholder": "在此输入您的 Markdown 文本...\n\n您可以使用：\n- **粗体** 文本\n- *斜体* 文本\n- ~~删除线~~\n- 列表\n- 链接\n- 表格\n- 任务列表：- [x] 已完成\n- 以及更多 GFM 特性！",
-  "noContent": "未配置内容。点击「编辑文本」添加内容。",
-  "noStorage": "请先配置文本插件",
-  "goConfig": "前往配置",
+  "textPlaceholder": "在此输入文本(支持Markdown)...",
   "initializing": "初始化中..."
 }

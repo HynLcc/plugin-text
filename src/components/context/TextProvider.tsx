@@ -1,10 +1,24 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { IUIConfig, usePluginBridge } from '@teable/sdk';
-import { useTextStorage } from '@/hooks/useTextStorage';
-import type { ITextContext, ITextStorage } from './types';
+import { sonner } from '@teable/ui-lib'
+import { useTranslation } from 'react-i18next';
+import { usePluginStorage } from '@/hooks/usePluginStorage';
+import type { ITextContext, ITextStorage, IParentBridgeMethods } from './types';
 
-export const TextContext = createContext<ITextContext | null>(null);
+const { toast } = sonner;  
+
+export const TextContext = createContext<ITextContext>({
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onStorageChange: (storage: ITextStorage) => Promise.resolve(storage),
+  content: '',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setContent: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  handleSave: async () => {},
+  isSaving: false,
+  isLoading: true,
+});
 
 export const useTextContext = () => {
   const context = useContext(TextContext);
@@ -15,9 +29,33 @@ export const useTextContext = () => {
 };
 
 export const TextProvider = ({ children }: { children: React.ReactNode }) => {
+  const { t } = useTranslation();
   const bridge = usePluginBridge();
-  const { storage, isLoading, updateStorage } = useTextStorage();
+  const { storage, isLoading, updateStorage } = usePluginStorage();
   const [uiConfig, setUIConfig] = useState<IUIConfig | undefined>();
+  const [storageState, setStorageState] = useState<ITextStorage | null | undefined>(
+    storage
+  );
+  const preStorage = useRef<ITextStorage | undefined>();
+  // Content state for TextConfig
+  const [content, setContent] = useState<string>('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update storageState and content when storage changes
+  useEffect(() => {
+    // Keep null as null (don't convert to undefined)
+    // null means storage was loaded but doesn't exist (new plugin)
+    // undefined means storage hasn't been loaded yet
+    setStorageState(storage);
+    
+    // Update content when storage changes
+    if (storage?.content !== undefined) {
+      setContent(storage.content);
+    } else if (storage === null) {
+      // When storage is null, reset content to empty string
+      setContent('');
+    }
+  }, [storage]);
 
   useEffect(() => {
     if (!bridge) {
@@ -34,20 +72,63 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const onStorageChange = useCallback(
     async (newStorage: ITextStorage): Promise<unknown> => {
-      return await updateStorage(newStorage);
+      try {
+        preStorage.current = newStorage;
+        setStorageState(newStorage);
+        const result = await updateStorage(newStorage);
+        return result;
+      } catch (error) {
+        console.error('Failed to update storage', error);
+        // Revert to previous storage on error
+        if (preStorage.current) {
+          setStorageState(preStorage.current);
+        }
+        throw error;
+      }
     },
     [updateStorage]
   );
 
-  const value: ITextContext = {
-    storage: storage || undefined,
-    uiConfig,
-    onStorageChange,
-  };
+  // Handle save for TextConfig
+  const handleSave = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      await onStorageChange({ content });
+      // Show success toast
+      toast.success(t('saveSuccess'));
+    } catch (error) {
+      console.error('Failed to save content', error);
+      // Show error toast
+      toast.error(t('saveError') || 'Failed to save content');
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [content, onStorageChange, t]);
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-full">Loading...</div>;
-  }
+  // Get parentBridgeMethods from bridge
+  const parentBridgeMethods: IParentBridgeMethods | undefined = bridge
+    ? {
+        expandPlugin: () => {
+          if (bridge && typeof (bridge as any).expandPlugin === 'function') {
+            (bridge as any).expandPlugin();
+          }
+        },
+      }
+    : undefined;
+
+  const value: ITextContext = {
+    // Pass undefined when storage is null, so TextPages can detect no storage
+    storage: storageState,
+    uiConfig,
+    parentBridgeMethods,
+    onStorageChange,
+    content,
+    setContent,
+    handleSave,
+    isSaving,
+    isLoading,
+  };
 
   return <TextContext.Provider value={value}>{children}</TextContext.Provider>;
 };

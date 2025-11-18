@@ -12,7 +12,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tanstack/react-query": "4.36.1",
     "@teable/core": "latest",
-    "@teable/next-themes": "0.3.5",
+    "@teable/next-themes": "latest",
     "@teable/openapi": "latest",
     "@teable/sdk": "latest",
     "@teable/ui-lib": "latest",
@@ -23,7 +23,7 @@
     "react-i18next": "14.1.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1"
-  },
+    },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",

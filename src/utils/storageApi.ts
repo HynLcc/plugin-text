@@ -81,23 +81,29 @@ export const fetchStorageFromApi = async (params: StorageApiParams): Promise<ITe
   try {
     const apiPath = buildStorageApiPathForGet(params);
     const response = await axios.get(apiPath);
-    
-    // 假设 API 返回的数据结构包含 storage 字段
-    const storageData = response.data?.storage || response.data;
-    
+
+    // Check if storage field exists in response
+    // If storage field doesn't exist, return null (no storage configured)
+    if (!response.data?.storage) {
+      return null;
+    }
+
+    const storageData = response.data.storage;
+
     if (storageData && typeof storageData === 'object') {
-      return {
+      const result = {
         content: (storageData.content as string) || '',
       };
+      return result;
     }
-    
+
     return null;
   } catch (error: any) {
     // 如果返回 404，说明还没有存储数据，返回 null
     if (error.response?.status === 404) {
       return null;
     }
-    console.error('Failed to fetch storage from API', error);
+    console.error('[fetchStorageFromApi] Failed to fetch storage from API', error);
     throw error;
   }
 };

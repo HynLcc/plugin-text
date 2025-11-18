@@ -17,8 +17,24 @@ export interface ITextStorage {
   content: string;
 }
 
+export interface IParentBridgeMethods {
+  expandPlugin?: () => void;
+}
+
 export interface ITextContext {
-  storage?: ITextStorage;
+  // storage can be:
+  // - undefined: not loaded yet
+  // - null: loaded but no storage exists (new plugin)
+  // - ITextStorage: storage exists
+  storage?: ITextStorage | null;
   uiConfig?: IUIConfig;
+  parentBridgeMethods?: IParentBridgeMethods;
   onStorageChange: (storage: ITextStorage) => Promise<unknown>;
+  // For TextConfig
+  content: string;
+  setContent: (content: string) => void;
+  handleSave: () => Promise<void>;
+  isSaving: boolean;
+  // Loading state
+  isLoading: boolean;
 }

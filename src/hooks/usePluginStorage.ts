@@ -26,10 +26,10 @@ import type { ITextStorage } from '@/components/context/types';
  * @returns {boolean} isLoading - Loading state indicator
  * @returns {Function} updateStorage - Function to update storage
  */
-export const useTextStorage = () => {
+export const usePluginStorage = () => {
   const bridge = usePluginBridge();
   const envParams = useContext(EvnContext);
-  const [storage, setStorage] = useState<ITextStorage | null>(null);
+  const [storage, setStorage] = useState<ITextStorage | null | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [viewId, setViewId] = useState<string>();
 
@@ -142,9 +142,12 @@ export const useTextStorage = () => {
         });
         if (result) {
           setStorage(result);
+        } else {
+          setStorage(null);
         }
       } catch (error) {
-        console.error('Failed to load storage', error);
+        console.error('[usePluginStorage] Failed to load storage', error);
+        setStorage(null);
       } finally {
         setIsLoading(false);
       }
@@ -159,23 +162,23 @@ export const useTextStorage = () => {
 
   /**
    * Update storage with type-specific strategy
-   * 
+   *
    * This function implements different update strategies based on plugin type:
-   * 
+   *
    * 1. View plugins:
    *    - Uses API PATCH request: /table/{tableId}/view/{viewId}/plugin/{pluginId}
    *    - Requires: tableId, viewId, pluginId
    *    - Updates storage via updateStorageViaApi()
-   * 
+   *
    * 2. Dashboard/Panel plugins:
    *    - Uses bridge.updateStorage() method (recommended)
    *    - Falls back to postMessage if bridge method unavailable
-   * 
+   *
    * Error handling:
    * - Validates required parameters before API calls
    * - Throws descriptive errors for missing parameters
    * - Logs errors for debugging
-   * 
+   *
    * @param {ITextStorage} newStorage - Storage data to save
    * @returns {Promise<unknown>} Updated storage data or result from bridge
    * @throws {Error} If required parameters are missing or update fails
@@ -184,7 +187,7 @@ export const useTextStorage = () => {
     async (newStorage: ITextStorage): Promise<unknown> => {
       try {
         const { positionType, baseId, tableId, positionId, pluginInstallId, pluginId } = envParams;
-        
+
         // View-type plugins: Use API PATCH request
         if (positionType === PluginPosition.View) {
           if (!tableId || !viewId || !pluginId) {
@@ -205,14 +208,14 @@ export const useTextStorage = () => {
           setStorage(updatedStorage);
           return updatedStorage;
         }
-        
+
         // Dashboard/Panel plugins: Use bridge.updateStorage() method
         if (bridge && typeof (bridge as any).updateStorage === 'function') {
           const result = await (bridge as any).updateStorage(newStorage);
           setStorage(newStorage);
           return result;
         }
-        
+
         // Fallback: Use postMessage for cross-window communication
         if (window.parent) {
           window.parent.postMessage(
@@ -225,7 +228,7 @@ export const useTextStorage = () => {
           setStorage(newStorage);
           return newStorage;
         }
-        
+
         throw new Error('No storage update method available');
       } catch (error) {
         console.error('Failed to update storage', error);
@@ -241,3 +244,4 @@ export const useTextStorage = () => {
     updateStorage,
   };
 };
+

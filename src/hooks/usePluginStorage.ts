@@ -22,7 +22,10 @@ import type { ITextStorage } from '@/components/context/types';
  * - Type-specific update strategies
  * 
  * @returns {Object} Storage management interface
- * @returns {ITextStorage | null} storage - Current storage data
+ * @returns {ITextStorage | null | undefined} storage - Current storage data
+ *   - undefined: not loaded yet
+ *   - null: loaded but no storage exists (new plugin)
+ *   - ITextStorage: storage exists with content
  * @returns {boolean} isLoading - Loading state indicator
  * @returns {Function} updateStorage - Function to update storage
  */

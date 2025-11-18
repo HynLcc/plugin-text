@@ -25,11 +25,11 @@ export const TextPages = () => {
     // This prevents showing edit button first, then switching to text viewer
     if (storage === undefined) {
       // While storage is undefined, show loading state
-      return <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>;
+      return <div className="flex items-center justify-center h-full text-muted-foreground">{t('initializing')}</div>;
     }
 
     // View-type plugin: check if storage is empty (null or content is empty string)
-    const isEmpty = !storage || !storage.content || storage.content.trim().length === 0;
+    const isEmpty = storage === null || !storage.content || storage.content.trim().length === 0;
     // View-type plugin: use local edit mode
     return (
       <div className="flex flex-col h-full">
@@ -102,11 +102,12 @@ export const TextPages = () => {
   // This prevents showing edit button first, then switching to text viewer
   if (storage === undefined) {
     // While storage is undefined, show loading state
-    return <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>;
+    return <div className="flex items-center justify-center h-full text-muted-foreground">{t('initializing')}</div>;
   }
   
   // After loading completes, check if storage has content (non-empty string)
-  const hasContent = storage !== null && storage !== undefined && storage.content && storage.content.trim().length > 0;
+  // storage is guaranteed to be non-undefined here, so we only need to check null
+  const hasContent = storage !== null && storage.content && storage.content.trim().length > 0;
   
   // If storage has content, show TextViewer
   if (hasContent) {

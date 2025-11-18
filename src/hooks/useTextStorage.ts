@@ -1,90 +1,171 @@
 import { usePluginBridge } from '@teable/sdk';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
+import { PluginPosition } from '@teable/openapi';
+import { axios } from '@teable/openapi';
+import { EvnContext } from '@/components/context/EnvProvider';
+import { fetchStorageFromApi, updateStorageViaApi } from '@/utils/storageApi';
 import type { ITextStorage, IParentBridgeMethods } from '@/components/context/types';
-
-const DEFAULT_STORAGE: ITextStorage = {
-  content: '',
-};
 
 export const useTextStorage = () => {
   const bridge = usePluginBridge();
-  const [storage, setStorage] = useState<ITextStorage>(DEFAULT_STORAGE);
+  const envParams = useContext(EvnContext);
+  const [storage, setStorage] = useState<ITextStorage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewId, setViewId] = useState<string>();
+  const [parentBridgeMethods, setParentBridgeMethods] = useState<IParentBridgeMethods | undefined>();
 
-  const parentBridgeMethods: IParentBridgeMethods = {
-    updateStorage: bridge?.updateStorage?.bind(bridge),
-    getStorage: bridge?.getStorage?.bind(bridge),
-  };
-
-  // 加载存储数据
-  const loadStorage = useCallback(async () => {
-    if (!bridge?.getStorage) {
-      setIsLoading(false);
+  // 初始化 axios 配置（只执行一次）
+  useEffect(() => {
+    if (!bridge) {
       return;
     }
-
-    try {
-      const data = await bridge.getStorage();
-      if (data && typeof data === 'object') {
-        const textStorage: ITextStorage = {
-          content: (data.content as string) || '',
-        };
-        setStorage(textStorage);
-      }
-    } catch (error) {
-      console.error('Failed to load storage', error);
-    } finally {
-      setIsLoading(false);
-    }
+    // 检查是否已经配置过拦截器
+    const interceptorId = axios.interceptors.request.use(async (config) => {
+      config.baseURL = 'http://127.0.0.1:3000/api';
+      config.headers.Authorization = `Bearer ${await bridge.getSelfTempToken().then(res => res.accessToken)}`;
+      return config;
+    });
+    
+    return () => {
+      // 清理拦截器
+      axios.interceptors.request.eject(interceptorId);
+    };
   }, [bridge]);
 
-  // 更新存储数据
-  const updateStorage = useCallback(
-    async (newStorage: ITextStorage) => {
-      if (!bridge?.updateStorage) {
-        // 如果没有 bridge 方法，使用 localStorage 作为降级方案
-        localStorage.setItem('teable-text-plugin-storage', JSON.stringify(newStorage));
-        setStorage(newStorage);
-        return;
-      }
+  // 获取 viewId（View 类型插件需要）
+  useEffect(() => {
+    if (!bridge) {
+      return;
+    }
+    const syncUrlParamsListener = (params: any) => {
+      setViewId(params.viewId);
+    };
+    bridge.on('syncUrlParams', syncUrlParamsListener);
+    
+    return () => {
+      bridge.removeListener('syncUrlParams', syncUrlParamsListener);
+    };
+  }, [bridge]);
 
-      try {
-        await bridge.updateStorage(newStorage as Record<string, unknown>);
-        setStorage(newStorage);
-      } catch (error) {
-        console.error('Failed to update storage', error);
-        throw error;
-      }
-    },
-    [bridge]
-  );
-
-  // 监听存储变化
   useEffect(() => {
     if (!bridge) {
       setIsLoading(false);
       return;
     }
 
-    // 初始加载
-    loadStorage();
+    const { positionType, baseId, tableId, positionId, pluginInstallId } = envParams;
 
-    // 监听存储同步事件
-    const storageListener = (data: Record<string, unknown>) => {
-      if (data && typeof data === 'object') {
+    // 对于 View 类型，需要等待 viewId
+    if (positionType === PluginPosition.View && !viewId) {
+      setIsLoading(true);
+      return;
+    }
+
+    // 获取父窗口的 bridge 方法
+    const methods: IParentBridgeMethods = {
+      updateStorage: async (storageData: Record<string, unknown>) => {
+        // 优先使用 API 更新
+        try {
+          const updatedStorage = await updateStorageViaApi(
+            {
+              positionType,
+              baseId,
+              tableId,
+              positionId,
+              pluginInstallId,
+              viewId,
+            },
+            storageData as unknown as ITextStorage
+          );
+          return updatedStorage;
+        } catch (error) {
+          console.error('Failed to update storage via API, trying bridge method', error);
+          // 如果 API 失败，尝试使用 bridge 方法
+          if (bridge && typeof (bridge as any).updateStorage === 'function') {
+            return await (bridge as any).updateStorage(storageData);
+          }
+          throw error;
+        }
+      },
+      getStorage: async () => {
+        // 优先使用 API 获取
+        try {
+          const result = await fetchStorageFromApi({
+            positionType,
+            baseId,
+            tableId,
+            positionId,
+            pluginInstallId,
+            viewId,
+          });
+          return result ? (result as unknown as Record<string, unknown>) : null;
+        } catch (error) {
+          console.error('Failed to get storage via API, trying bridge method', error);
+          // 如果 API 失败，尝试使用 bridge 方法
+          if (bridge && typeof (bridge as any).getStorage === 'function') {
+            return await (bridge as any).getStorage();
+          }
+          return null;
+        }
+      },
+    };
+
+    setParentBridgeMethods(methods);
+
+    // 监听 storage 同步事件
+    const syncStorageListener = (storageData: Record<string, unknown>) => {
+      if (storageData && typeof storageData === 'object') {
         const textStorage: ITextStorage = {
-          content: (data.content as string) || '',
+          content: (storageData.content as string) || '',
         };
         setStorage(textStorage);
       }
     };
 
-    bridge.on('syncStorage', storageListener);
+    // 监听 syncStorage 事件
+    bridge.on('syncStorage' as any, syncStorageListener);
+
+    // 初始化时通过 API 获取 storage
+    const loadStorage = async () => {
+      try {
+        const result = await fetchStorageFromApi({
+          positionType,
+          baseId,
+          tableId,
+          positionId,
+          pluginInstallId,
+          viewId,
+        });
+        if (result) {
+          setStorage(result);
+        }
+      } catch (error) {
+        console.error('Failed to load storage', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadStorage();
 
     return () => {
-      bridge.removeListener('syncStorage', storageListener);
+      bridge.removeListener('syncStorage' as any, syncStorageListener);
     };
-  }, [bridge, loadStorage]);
+  }, [bridge, envParams, viewId]);
+
+  const updateStorage = useCallback(
+    async (newStorage: ITextStorage): Promise<unknown> => {
+      try {
+        const result = await parentBridgeMethods?.updateStorage?.(newStorage as unknown as Record<string, unknown>);
+        setStorage(newStorage);
+        return result;
+      } catch (error) {
+        console.error('Failed to update storage', error);
+        throw error;
+      }
+    },
+    [parentBridgeMethods]
+  );
 
   return {
     storage,

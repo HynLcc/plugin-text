@@ -11,13 +11,11 @@ export const TextConfig = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // 初始化内容
   useEffect(() => {
-    if (storage?.content !== undefined) {
+    if (storage?.content) {
       setContent(storage.content);
-      if (!storage.content) {
-        setIsEditing(true);
-      }
+    } else {
+      setIsEditing(true);
     }
   }, [storage]);
 

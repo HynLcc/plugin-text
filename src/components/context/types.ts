@@ -19,7 +19,7 @@ export interface ITextStorage {
 
 export interface IParentBridgeMethods {
   updateStorage?: (storage: Record<string, unknown>) => Promise<unknown>;
-  getStorage?: () => Promise<Record<string, unknown>>;
+  getStorage?: () => Promise<Record<string, unknown> | null>;
 }
 
 export interface ITextContext {

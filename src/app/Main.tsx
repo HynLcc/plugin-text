@@ -5,11 +5,11 @@ import { TextProvider, useTextContext } from '@/components/context/TextProvider'
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@teable/next-themes';
 
-function ThemeWrapper({ theme, children }: { theme: string; children: React.ReactNode }) {
+function ThemedContent({ theme }: { theme: string }) {
   const { uiConfig } = useTextContext();
   return (
     <ThemeProvider attribute="class" forcedTheme={uiConfig?.theme ?? theme}>
-      {children}
+      <TextPages />
     </ThemeProvider>
   );
 }
@@ -18,12 +18,10 @@ export default function Main({ theme }: { theme: string }) {
   const queryClient = getQueryClient();
 
   return (
-    <TextProvider>
-      <ThemeWrapper theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <TextPages />
-        </QueryClientProvider>
-      </ThemeWrapper>
-    </TextProvider>
+    <QueryClientProvider client={queryClient}>
+      <TextProvider>
+        <ThemedContent theme={theme} />
+      </TextProvider>
+    </QueryClientProvider>
   );
 }

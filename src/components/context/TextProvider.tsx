@@ -17,7 +17,6 @@ export const useTextContext = () => {
 export const TextProvider = ({ children }: { children: React.ReactNode }) => {
   const bridge = usePluginBridge();
   const { storage, isLoading, updateStorage } = useTextStorage();
-  const [tab, setTab] = useState<'text' | 'setting'>('text');
   const [uiConfig, setUIConfig] = useState<IUIConfig | undefined>();
 
   useEffect(() => {
@@ -33,10 +32,6 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [bridge]);
 
-  const onTabChange = useCallback((newTab: 'text' | 'setting') => {
-    setTab(newTab);
-  }, []);
-
   const onStorageChange = useCallback(
     async (newStorage: ITextStorage): Promise<unknown> => {
       return await updateStorage(newStorage);
@@ -45,10 +40,8 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   const value: ITextContext = {
-    tab,
     storage: storage || undefined,
     uiConfig,
-    onTabChange,
     onStorageChange,
   };
 

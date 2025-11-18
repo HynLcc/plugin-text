@@ -18,9 +18,7 @@ export interface ITextStorage {
 }
 
 export interface ITextContext {
-  tab: 'text' | 'setting';
   storage?: ITextStorage;
   uiConfig?: IUIConfig;
-  onTabChange: (tab: 'text' | 'setting') => void;
   onStorageChange: (storage: ITextStorage) => Promise<unknown>;
 }

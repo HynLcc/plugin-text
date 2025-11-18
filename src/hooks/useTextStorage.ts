@@ -6,18 +6,12 @@ import { EvnContext } from '@/components/context/EnvProvider';
 import { fetchStorageFromApi, updateStorageViaApi } from '@/utils/storageApi';
 import type { ITextStorage } from '@/components/context/types';
 
-interface IParentBridgeMethods {
-  updateStorage?: (storage: Record<string, unknown>) => Promise<unknown>;
-  getStorage?: () => Promise<Record<string, unknown> | null>;
-}
-
 export const useTextStorage = () => {
   const bridge = usePluginBridge();
   const envParams = useContext(EvnContext);
   const [storage, setStorage] = useState<ITextStorage | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [viewId, setViewId] = useState<string>();
-  const [parentBridgeMethods, setParentBridgeMethods] = useState<IParentBridgeMethods | undefined>();
 
   // 初始化 axios 配置（只执行一次）
   useEffect(() => {
@@ -66,77 +60,6 @@ export const useTextStorage = () => {
       return;
     }
 
-    // 获取父窗口的 bridge 方法
-    const methods: IParentBridgeMethods = {
-      updateStorage: async (storageData: Record<string, unknown>) => {
-        // View 类型使用 API 更新
-        if (positionType === PluginPosition.View) {
-          try {
-            const updatedStorage = await updateStorageViaApi(
-              {
-                positionType,
-                baseId,
-                tableId,
-                positionId,
-                pluginInstallId,
-                pluginId,
-                viewId,
-              },
-              storageData as unknown as ITextStorage
-            );
-            return updatedStorage;
-          } catch (error) {
-            console.error('Failed to update storage via API for View plugin', error);
-            throw error;
-          }
-        }
-        
-        // 其他类型使用 bridge 方法更新
-        if (bridge && typeof (bridge as any).updateStorage === 'function') {
-          return await (bridge as any).updateStorage(storageData);
-        }
-        // 如果 bridge 没有 updateStorage，尝试通过 postMessage 通信
-        return new Promise((resolve, reject) => {
-          if (window.parent) {
-            window.parent.postMessage(
-              {
-                type: 'updateStorage',
-                storage: storageData,
-              },
-              '*'
-            );
-            resolve(undefined);
-          } else {
-            reject(new Error('No parent window available'));
-          }
-        });
-      },
-      getStorage: async () => {
-        // 优先使用 API 获取
-        try {
-          const result = await fetchStorageFromApi({
-            positionType,
-            baseId,
-            tableId,
-            positionId,
-            pluginInstallId,
-            pluginId,
-            viewId,
-          });
-          return result ? (result as unknown as Record<string, unknown>) : null;
-        } catch (error) {
-          console.error('Failed to get storage via API, trying bridge method', error);
-          // 如果 API 失败，尝试使用 bridge 方法
-          if (bridge && typeof (bridge as any).getStorage === 'function') {
-            return await (bridge as any).getStorage();
-          }
-          return null;
-        }
-      },
-    };
-
-    setParentBridgeMethods(methods);
-
     // 监听 storage 同步事件
     const syncStorageListener = (storageData: Record<string, unknown>) => {
       if (storageData && typeof storageData === 'object') {
@@ -147,7 +70,6 @@ export const useTextStorage = () => {
       }
     };
 
-    // 监听 syncStorage 事件
     bridge.on('syncStorage' as any, syncStorageListener);
 
     // 初始化时通过 API 获取 storage
@@ -205,18 +127,24 @@ export const useTextStorage = () => {
           return updatedStorage;
         }
         
-        // 其他类型使用 bridge 方法或 parentBridgeMethods
-        if (parentBridgeMethods?.updateStorage) {
-          const result = await parentBridgeMethods.updateStorage(newStorage as unknown as Record<string, unknown>);
-          setStorage(newStorage);
-          return result;
-        }
-        
-        // 降级方案：使用 bridge 方法
+        // 其他类型（Dashboard/Panel）使用 bridge 方法更新
         if (bridge && typeof (bridge as any).updateStorage === 'function') {
           const result = await (bridge as any).updateStorage(newStorage);
           setStorage(newStorage);
           return result;
+        }
+        
+        // 降级方案：通过 postMessage 通信
+        if (window.parent) {
+          window.parent.postMessage(
+            {
+              type: 'updateStorage',
+              storage: newStorage,
+            },
+            '*'
+          );
+          setStorage(newStorage);
+          return newStorage;
         }
         
         throw new Error('No storage update method available');
@@ -225,7 +153,7 @@ export const useTextStorage = () => {
         throw error;
       }
     },
-    [envParams, viewId, parentBridgeMethods, bridge]
+    [envParams, viewId, bridge]
   );
 
   return {

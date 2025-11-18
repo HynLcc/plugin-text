@@ -16,7 +16,7 @@ interface StorageApiParams {
  * 根据 positionType 构建 API 路径（用于 GET 请求）
  */
 const buildStorageApiPathForGet = (params: StorageApiParams): string => {
-  const { positionType, baseId, tableId, positionId, pluginInstallId, pluginId, viewId } = params;
+  const { positionType, baseId, tableId, positionId, pluginInstallId, viewId } = params;
 
   switch (positionType) {
     case PluginPosition.Dashboard:

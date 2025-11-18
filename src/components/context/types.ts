@@ -17,16 +17,10 @@ export interface ITextStorage {
   content: string;
 }
 
-export interface IParentBridgeMethods {
-  updateStorage?: (storage: Record<string, unknown>) => Promise<unknown>;
-  getStorage?: () => Promise<Record<string, unknown> | null>;
-}
-
 export interface ITextContext {
   tab: 'text' | 'setting';
   storage?: ITextStorage;
   uiConfig?: IUIConfig;
   onTabChange: (tab: 'text' | 'setting') => void;
   onStorageChange: (storage: ITextStorage) => Promise<unknown>;
-  parentBridgeMethods?: IParentBridgeMethods;
 }

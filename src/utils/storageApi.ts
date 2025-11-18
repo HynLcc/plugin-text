@@ -8,14 +8,15 @@ interface StorageApiParams {
   tableId?: string;
   positionId?: string;
   pluginInstallId?: string;
+  pluginId?: string;
   viewId?: string;
 }
 
 /**
- * 根据 positionType 构建 API 路径
+ * 根据 positionType 构建 API 路径（用于 GET 请求）
  */
-const buildStorageApiPath = (params: StorageApiParams): string => {
-  const { positionType, baseId, tableId, positionId, pluginInstallId, viewId } = params;
+const buildStorageApiPathForGet = (params: StorageApiParams): string => {
+  const { positionType, baseId, tableId, positionId, pluginInstallId, pluginId, viewId } = params;
 
   switch (positionType) {
     case PluginPosition.Dashboard:
@@ -31,6 +32,7 @@ const buildStorageApiPath = (params: StorageApiParams): string => {
       return `/table/${tableId}/plugin-panel/${positionId}/plugin/${pluginInstallId}`;
 
     case PluginPosition.View:
+      // View 类型 GET 请求不包含 pluginId
       if (!tableId || !viewId) {
         throw new Error('Missing required parameters for View plugin');
       }
@@ -42,11 +44,42 @@ const buildStorageApiPath = (params: StorageApiParams): string => {
 };
 
 /**
+ * 根据 positionType 构建 API 路径（用于更新请求 PUT/PATCH）
+ */
+const buildStorageApiPathForUpdate = (params: StorageApiParams): string => {
+  const { positionType, baseId, tableId, positionId, pluginInstallId, pluginId, viewId } = params;
+
+  switch (positionType) {
+    case PluginPosition.Dashboard:
+      if (!baseId || !positionId || !pluginInstallId) {
+        throw new Error('Missing required parameters for Dashboard plugin');
+      }
+      return `/base/${baseId}/dashboard/${positionId}/plugin/${pluginInstallId}`;
+
+    case PluginPosition.Panel:
+      if (!tableId || !positionId || !pluginInstallId) {
+        throw new Error('Missing required parameters for Panel plugin');
+      }
+      return `/table/${tableId}/plugin-panel/${positionId}/plugin/${pluginInstallId}`;
+
+    case PluginPosition.View:
+      // View 类型更新请求需要包含 pluginId
+      if (!tableId || !viewId || !pluginId) {
+        throw new Error('Missing required parameters for View plugin update');
+      }
+      return `/table/${tableId}/view/${viewId}/plugin/${pluginId}`;
+
+    default:
+      throw new Error(`Unsupported plugin position type: ${positionType}`);
+  }
+};
+
+/**
  * 通过 API 获取 Storage
  */
 export const fetchStorageFromApi = async (params: StorageApiParams): Promise<ITextStorage | null> => {
   try {
-    const apiPath = buildStorageApiPath(params);
+    const apiPath = buildStorageApiPathForGet(params);
     const response = await axios.get(apiPath);
     
     // 假设 API 返回的数据结构包含 storage 字段
@@ -77,8 +110,10 @@ export const updateStorageViaApi = async (
   storage: ITextStorage
 ): Promise<ITextStorage> => {
   try {
-    const apiPath = buildStorageApiPath(params);
-    const response = await axios.put(apiPath, { storage });
+    const apiPath = buildStorageApiPathForUpdate(params);
+    // View 类型使用 PATCH，其他类型使用 PUT
+    const method = params.positionType === PluginPosition.View ? 'patch' : 'put';
+    const response = await axios[method](apiPath, { storage });
     
     const storageData = response.data?.storage || response.data;
     

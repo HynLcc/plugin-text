@@ -16,7 +16,7 @@ export const useTextContext = () => {
 
 export const TextProvider = ({ children }: { children: React.ReactNode }) => {
   const bridge = usePluginBridge();
-  const { storage, isLoading, updateStorage, parentBridgeMethods } = useTextStorage();
+  const { storage, isLoading, updateStorage } = useTextStorage();
   const [tab, setTab] = useState<'text' | 'setting'>('text');
   const [uiConfig, setUIConfig] = useState<IUIConfig | undefined>();
 
@@ -46,11 +46,10 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value: ITextContext = {
     tab,
-    storage,
+    storage: storage || undefined,
     uiConfig,
     onTabChange,
     onStorageChange,
-    parentBridgeMethods,
   };
 
   if (isLoading) {

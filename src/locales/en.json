@@ -1,0 +1,11 @@
+{
+  "title": "Text Plugin",
+  "configureText": "Configure Text Content",
+  "editText": "Edit Text",
+  "save": "Save",
+  "saving": "Saving...",
+  "cancel": "Cancel",
+  "textPlaceholder": "Enter your Markdown text here...\n\nYou can use:\n- **Bold** text\n- *Italic* text\n- ~~Strikethrough~~\n- Lists\n- Links\n- Tables\n- Task lists: - [x] Done\n- And more GFM features!",
+  "noContent": "No content configured. Click 'Edit Text' to add content.",
+  "initializing": "Initializing..."
+}

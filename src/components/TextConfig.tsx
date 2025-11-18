@@ -14,7 +14,7 @@ export const TextConfig = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={t('textPlaceholder')}
-          className="h-full w-full font-mono text-xs resize-none"
+          className="h-full w-full font-mono text-xs resize-none text-foreground placeholder:text-muted-foreground"
         />
       </div>
     </div>

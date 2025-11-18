@@ -62,7 +62,7 @@ export const TextPages = () => {
                 onClick={() => setIsEditMode(true)}
                 className="text-xs"
               >
-                {t('editText')}
+                {t('viewEditText')}
               </Button>
             </div>
           ) : (

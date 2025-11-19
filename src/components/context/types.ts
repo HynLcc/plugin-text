@@ -15,6 +15,7 @@ export interface IPageParams {
 
 export interface ITextStorage {
   content: string;
+  horizontalAlign?: 'left' | 'center' | 'right';
 }
 
 export interface IParentBridgeMethods {
@@ -33,6 +34,8 @@ export interface ITextContext {
   // For TextConfig
   content: string;
   setContent: (content: string) => void;
+  horizontalAlign: 'left' | 'center' | 'right';
+  setHorizontalAlign: (align: 'left' | 'center' | 'right') => void;
   handleSave: () => Promise<void>;
   isSaving: boolean;
   // Loading state

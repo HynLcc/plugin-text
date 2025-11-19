@@ -14,6 +14,9 @@ export const TextContext = createContext<ITextContext>({
   content: '',
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setContent: () => {},
+  horizontalAlign: 'left',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setHorizontalAlign: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   handleSave: async () => {},
   isSaving: false,
@@ -37,6 +40,7 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
   const preStorage = useRef<ITextStorage | undefined>();
   // Content state for TextConfig
   const [content, setContent] = useState<string>('');
+  const [horizontalAlign, setHorizontalAlign] = useState<'left' | 'center' | 'right'>('left');
   const [isSaving, setIsSaving] = useState(false);
   
   // Use ref to track previous storage value to avoid unnecessary updates
@@ -49,14 +53,14 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
     if (prevStorageRef.current === storage) {
       return;
     }
-    
+
     prevStorageRef.current = storage;
-    
+
     // Keep null as null (don't convert to undefined)
     // null means storage was loaded but doesn't exist (new plugin)
     // undefined means storage hasn't been loaded yet
     setStorageState(storage);
-    
+
     // Update content when storage changes
     if (storage?.content !== undefined) {
       setContent(storage.content);
@@ -64,7 +68,15 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
       // When storage is null, reset content to empty string
       setContent('');
     }
-    // Note: if storage is undefined, we don't update content (keep current state)
+
+    // Update alignment states
+    if (storage?.horizontalAlign) {
+      setHorizontalAlign(storage.horizontalAlign);
+    } else if (storage === null) {
+      // Default alignment for new storage
+      setHorizontalAlign('left');
+    }
+    // Note: if storage is undefined, we don't update states (keep current state)
   }, [storage]);
 
   useEffect(() => {
@@ -103,7 +115,7 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
-      await onStorageChange({ content });
+      await onStorageChange({ content, horizontalAlign });
       // Show success toast
       toast.success(t('saveSuccess'));
     } catch (error) {
@@ -114,7 +126,7 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsSaving(false);
     }
-  }, [content, onStorageChange, t]);
+  }, [content, horizontalAlign, onStorageChange, t]);
 
   // Memoize parentBridgeMethods to avoid recreating on every render
   const parentBridgeMethods: IParentBridgeMethods | undefined = useMemo(() => {
@@ -140,6 +152,8 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
       onStorageChange,
       content,
       setContent,
+      horizontalAlign,
+      setHorizontalAlign,
       handleSave,
       isSaving,
       isLoading,
@@ -150,6 +164,8 @@ export const TextProvider = ({ children }: { children: React.ReactNode }) => {
       parentBridgeMethods,
       onStorageChange,
       content,
+      horizontalAlign,
+      setHorizontalAlign,
       handleSave,
       isSaving,
       isLoading,

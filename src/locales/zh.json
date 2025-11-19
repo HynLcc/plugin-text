@@ -7,5 +7,15 @@
   "saveError": "保存失败",
   "cancel": "取消",
   "textPlaceholder": "在此输入文本(支持Markdown)...",
-  "initializing": "初始化中..."
+  "initializing": "初始化中...",
+  "align": {
+    "horizontal": "水平对齐",
+    "vertical": "垂直对齐",
+    "left": "左对齐",
+    "center": "居中",
+    "right": "右对齐",
+    "top": "顶端",
+    "middle": "居中",
+    "bottom": "底端"
+  }
 }

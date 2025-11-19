@@ -7,5 +7,15 @@
   "saveError": "Save Failed",
   "cancel": "Cancel",
   "textPlaceholder": "Enter text here (Markdown supported)...",
-  "initializing": "Initializing..."
+  "initializing": "Initializing...",
+  "align": {
+    "horizontal": "Horizontal Alignment",
+    "vertical": "Vertical Alignment",
+    "left": "Left",
+    "center": "Center",
+    "right": "Right",
+    "top": "Top",
+    "middle": "Middle",
+    "bottom": "Bottom"
+  }
 }

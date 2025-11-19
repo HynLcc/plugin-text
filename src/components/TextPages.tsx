@@ -11,7 +11,7 @@ import { PluginPosition } from '@teable/openapi';
 export const TextPages = () => {
   const { t } = useTranslation();
   const { pluginInstallId, positionType } = useContext(EvnContext);
-  const { storage, uiConfig, isLoading, parentBridgeMethods } = useTextContext();
+  const { storage, uiConfig, isLoading, parentBridgeMethods, horizontalAlign, setHorizontalAlign } = useTextContext();
   const isShowingSettings = uiConfig?.isShowingSettings;
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -35,18 +35,38 @@ export const TextPages = () => {
       <div className="flex flex-col h-full">
         {/* Header - show when in edit mode */}
         {isEditMode && (
-          <div className="flex items-center justify-end px-1 py-1 pr-4 flex-shrink-0">
-            {/* Save and Cancel buttons */}
-            <div className="flex gap-2">
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() => setIsEditMode(false)}
-                className="text-xs"
-              >
-                {t('cancel')}
-              </Button>
-              <TextHeaderSaveButton onSaveComplete={() => setIsEditMode(false)} />
+          <div className="flex flex-col flex-shrink-0">
+            {/* Controls Row */}
+            <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+              {/* Alignment Controls */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">{t('align.horizontal')}</span>
+                <div className="flex gap-1">
+                  {['left', 'center', 'right'].map((align) => (
+                    <Button
+                      key={align}
+                      size="xs"
+                      variant={horizontalAlign === align ? "default" : "outline"}
+                      onClick={() => setHorizontalAlign(align as 'left' | 'center' | 'right')}
+                      className="text-xs"
+                    >
+                      {t(`align.${align}`)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => setIsEditMode(false)}
+                  className="text-xs"
+                >
+                  {t('cancel')}
+                </Button>
+                <TextHeaderSaveButton onSaveComplete={() => setIsEditMode(false)} />
+              </div>
             </div>
           </div>
         )}
@@ -86,9 +106,31 @@ export const TextPages = () => {
     return (
       <div className="flex flex-col h-full">
         {/* Header - show when settings panel is open */}
-        <div className="flex items-center justify-end px-1 py-1 pr-3 flex-shrink-0">
-          {/* Save button */}
-          <TextHeaderSaveButton />
+        <div className="flex flex-col flex-shrink-0">
+          {/* Controls Row */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+            {/* Alignment Controls */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">{t('align.horizontal')}</span>
+              <div className="flex gap-1">
+                {['left', 'center', 'right'].map((align) => (
+                  <Button
+                    key={align}
+                    size="xs"
+                    variant={horizontalAlign === align ? "default" : "outline"}
+                    onClick={() => setHorizontalAlign(align as 'left' | 'center' | 'right')}
+                    className="text-xs"
+                  >
+                    {t(`align.${align}`)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              <TextHeaderSaveButton />
+            </div>
+          </div>
         </div>
         {/* Main content area */}
         <div className="flex-1 overflow-hidden">

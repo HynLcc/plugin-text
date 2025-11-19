@@ -30,7 +30,7 @@ export const TextViewer = ({ onEdit, showEditButton = false }: TextViewerProps) 
         </div>
       )}
       <div className="flex-1 overflow-auto px-3 py-4">
-        <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:text-foreground prose-li:text-foreground prose-a:text-primary">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:bg-gray-100 prose-code:font-mono prose-code:text-gray-900 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-100 prose-pre:text-gray-900 prose-pre:font-mono prose-pre:px-4 prose-pre:py-3 prose-pre:rounded prose-pre:border prose-pre:border-gray-200 prose-pre:overflow-x-auto prose-li:text-foreground prose-a:text-primary">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       </div>

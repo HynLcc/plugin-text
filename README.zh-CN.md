@@ -1,6 +1,6 @@
 # Teable 文本插件
 
-本项目是基于 [Next.js](https://nextjs.org) 和 [Teable](https://teable.io) 的文本插件，用于在 Teable 中显示和管理文本内容。
+本项目是基于 [Next.js](https://nextjs.org) 和 [Teable](https://teable.ai) 的文本插件，用于在 Teable 中显示和管理文本内容。
 
 ## 功能特性
 - 📝 文本查看和编辑功能
@@ -10,14 +10,10 @@
 - 🪄 便于扩展和二次开发
 - 💾 支持可配置 API 的文本存储
 
-## 依赖
-- [Next.js](https://nextjs.org)
-- [@teable/core](https://www.npmjs.com/package/@teable/core)
-- [@teable/sdk](https://www.npmjs.com/package/@teable/sdk)
-- [@teable/openapi](https://www.npmjs.com/package/@teable/openapi)
-- [@teable/ui-lib](https://www.npmjs.com/package/@teable/ui-lib)
-- [@teable/next-themes](https://www.npmjs.com/package/@teable/next-themes)
-- [@tanstack/react-query](https://tanstack.com/query/latest)
+#### 🔌 视图、仪表盘、面板三种插件模式
+*展示视图、仪表盘、面板三种插件模式的不同用户体验*
+![仪表盘/插件面板](/docs/images/20251119213837_rec_-convert.gif)
+![视图](/docs/images/20251119214210_rec_-convert.gif)
 
 ## ⚠️ 配置要求
 
@@ -35,21 +31,18 @@ config.baseURL = 'https://your-api-server.com/api';
 npm install
 ```
 
-### 2. 配置 baseURL（必需）
-请参考上面的配置部分，然后继续操作。
-
-### 3. 启动开发环境
+### 2. 启动开发环境
 ```bash
 npm run dev
 ```
 访问 [http://localhost:3000](http://localhost:3000) 查看效果。
 
-### 4. 构建生产包
+### 3. 构建生产包
 ```bash
 npm run build
 ```
 
-### 5. 启动生产环境
+### 4. 启动生产环境
 ```bash
 npm start
 ```
@@ -65,9 +58,6 @@ npm start
 - `src/components/context/EnvProvider.tsx`：环境变量注入
 - `src/components/context/I18nProvider.tsx`：多语言支持
 - `src/components/context/TextProvider.tsx`：文本上下文提供者
-
-## 环境变量与插件参数
-通过 `EnvProvider` 组件自动从 URL 获取插件运行所需参数（如 `lang`、`baseId`、`pluginId` 等），无需手动配置。
 
 ## API 集成
 此插件需要外部 API 服务器进行文本存储和检索。请确保您的 API 服务器：

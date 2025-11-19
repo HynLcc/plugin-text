@@ -1,6 +1,6 @@
 # Teable Text Plugin
 
-This project is a Text plugin based on [Next.js](https://nextjs.org) and [Teable](https://teable.io), designed for displaying and managing text content within Teable.
+This project is a Text plugin based on [Next.js](https://nextjs.org) and [Teable](https://teable.ai), designed for displaying and managing text content within Teable, supporting complete Markdown editing and viewing functionality.
 
 ## Features
 - 📝 Text viewing and editing functionality
@@ -9,6 +9,11 @@ This project is a Text plugin based on [Next.js](https://nextjs.org) and [Teable
 - 🌍 Internationalization (i18n) support (English/Chinese)
 - 🪄 Easy to extend and customize
 - 💾 Text storage with configurable API
+
+#### 🔌 View, Dashboard, Panel Three Plugin Modes
+*Shows the different user experience of view, dashboard, and panel plugin modes*
+![Dashboard/Plugin Panel](docs/images/20251119213837_rec_-convert.gif)
+![View](docs/images/20251119214210_rec_-convert.gif)
 
 ## Dependencies
 - [Next.js](https://nextjs.org)

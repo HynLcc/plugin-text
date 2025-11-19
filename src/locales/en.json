@@ -8,6 +8,7 @@
   "cancel": "Cancel",
   "textPlaceholder": "Enter text here (Markdown supported)...",
   "initializing": "Initializing...",
+  "contentTooLong": "Content is too long. Maximum length is {{maxLength}} characters.",
   "align": {
     "horizontal": "Horizontal Alignment",
     "vertical": "Vertical Alignment",

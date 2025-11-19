@@ -8,6 +8,7 @@
   "cancel": "取消",
   "textPlaceholder": "在此输入文本(支持Markdown)...",
   "initializing": "初始化中...",
+  "contentTooLong": "内容过长。最大长度为 {{maxLength}} 个字符。",
   "align": {
     "horizontal": "水平对齐",
     "vertical": "垂直对齐",

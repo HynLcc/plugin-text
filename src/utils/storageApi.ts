@@ -93,6 +93,7 @@ export const fetchStorageFromApi = async (params: StorageApiParams): Promise<ITe
     if (storageData && typeof storageData === 'object') {
       const result = {
         content: (storageData.content as string) || '',
+        horizontalAlign: (storageData.horizontalAlign as 'left' | 'center' | 'right') || 'left',
       };
       return result;
     }

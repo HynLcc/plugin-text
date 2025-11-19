@@ -50,6 +50,6 @@ export const ALIGNMENT_OPTIONS: { value: HorizontalAlign; label: string }[] = [
 ];
 
 /**
- * Maximum content length (50KB) for performance and storage considerations
+ * Maximum content length (128KB) for performance and storage considerations
  */
-export const MAX_CONTENT_LENGTH = 51200;
+export const MAX_CONTENT_LENGTH = 131072;

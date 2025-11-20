@@ -1,5 +1,8 @@
 # Teable Text Plugin
 
+![Dashboard/Plugin Panel](docs/images/20251119213837_rec_-convert.gif)
+
+![View](docs/images/20251119214210_rec_-convert.gif)
 This project is a Text plugin based on [Next.js](https://nextjs.org) and [Teable](https://teable.ai), designed for displaying and managing text content within Teable, supporting complete Markdown editing and viewing functionality.
 
 ## Features
@@ -9,13 +12,10 @@ This project is a Text plugin based on [Next.js](https://nextjs.org) and [Teable
 - 🌍 Internationalization (i18n) support (English/Chinese)
 - 🪄 Easy to extend and customize
 - 💾 Text storage with configurable API
-- 📏 内容长度验证 (最大128KB)
-- 🎯 水平对齐控制 (左对齐/居中/右对齐)
+- 📏 Content length validation (128KB max)
+- 🎯 Horizontal alignment controls (left/center/right)
+- 🔌 View, Dashboard, Panel Three Plugin Modes
 
-#### 🔌 View, Dashboard, Panel Three Plugin Modes
-*Shows the different user experience of view, dashboard, and panel plugin modes*
-![Dashboard/Plugin Panel](docs/images/20251119213837_rec_-convert.gif)
-![View](docs/images/20251119214210_rec_-convert.gif)
 
 ## Dependencies
 - [Next.js](https://nextjs.org)
@@ -90,12 +90,4 @@ This plugin requires an external API server for text storage and retrieval. Make
 - Content length is limited to 128KB (131,072 characters) for performance
 - Real-time character count and validation feedback
 - Horizontal alignment applies to text, images, and lists in markdown content
-
-插件使用 React Query 进行数据获取和缓存
-所有文本操作通过存储 API 处理
-UI 响应式设计，支持明暗主题
-支持中英文国际化
-内容长度限制为 128KB (131,072 字符) 以保证性能
-实时字符计数和验证反馈
-水平对齐适用于 markdown 内容中的文本、图片和列表
 

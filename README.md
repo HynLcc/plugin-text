@@ -82,7 +82,7 @@ This plugin requires an external API server for text storage and retrieval. Make
 2. Supports the required endpoints for text operations
 3. Handles CORS properly if hosted on a different domain
 
-## 开发说明
+## Development
 - The plugin uses React Query for data fetching and caching
 - All text operations are handled through the storage API
 - The UI is responsive and supports both light and dark themes
